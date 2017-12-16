@@ -124,7 +124,7 @@ describe Songkick::OAuth2::Provider::Authorization do
     end
 
     describe "when the client has not registered a redirect_uri" do
-      before { @client.set(redirect_uri: nil) }
+      before { @client.update(redirect_uri: nil) }
 
       it "is valid" do
         authorization.error.should be_nil

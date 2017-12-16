@@ -21,8 +21,6 @@ module Sequel
 
         def oauth2_authorization_for(client)
           b = oauth2_authorizations.where(client_id: client.pk).first rescue nil
-          puts b.inspect
-          puts client.inspect
           b
         end
       end

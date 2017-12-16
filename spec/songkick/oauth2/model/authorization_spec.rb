@@ -48,7 +48,7 @@ describe Songkick::OAuth2::Model::Authorization do
     end
 
     it "is valid if both access_tokens are nil" do
-      Songkick::OAuth2::Model::Authorization.first.set(access_token: nil)
+      Songkick::OAuth2::Model::Authorization.first.update(access_token: nil)
       authorization.access_token = nil
       authorization.should be_valid
     end

@@ -25,7 +25,7 @@ module Songkick
           return unless @owner and not @error
 
           @model = @owner.oauth2_authorization_for(@client)
-          return unless @model # and not @model.expired? # and @model.in_scope?(scopes)
+          return unless @model and @model.in_scope?(scopes) and not @model.expired?
 
           @authorized = true
 

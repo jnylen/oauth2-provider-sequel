@@ -86,7 +86,7 @@ describe Songkick::OAuth2::Provider do
       end
 
       describe "and the authorization does not have a code" do
-        before { @authorization.set(code: nil) }
+        before { @authorization.update(code: nil) }
 
         it "generates a new code and redirects" do
           Songkick::OAuth2::Model::Authorization.should_not_receive(:create)
@@ -99,7 +99,7 @@ describe Songkick::OAuth2::Provider do
       end
 
       describe "and the authorization is expired" do
-        before { @authorization.set(expires_at: 2.hours.ago) }
+        before { @authorization.update(expires_at: 2.hours.ago) }
         it_should_behave_like "asks for user permission"
       end
     end
@@ -395,7 +395,7 @@ describe Songkick::OAuth2::Provider do
 
         describe "with a scope parameter" do
           before do
-            @authorization.set(scope: 'foo bar')
+            @authorization.update(scope: 'foo bar')
           end
 
           it "passes the scope back in the success response" do
@@ -436,7 +436,7 @@ describe Songkick::OAuth2::Provider do
 
       describe "when there is an Authorization with code and token" do
         before do
-          @authorization.set(:code => 'pending_code', :access_token => 'working_token')
+          @authorization.update(:code => 'pending_code', :access_token => 'working_token')
           Songkick::OAuth2.stub(:random_string).and_return('random_access_token')
         end
 

@@ -33,12 +33,12 @@ describe Songkick::OAuth2::Model::Client do
   end
 
   it "cannot mass-assign client_id" do
-    @client.set(:client_id => 'foo')
+    @client.update(:client_id => 'foo')
     @client.client_id.should_not == 'foo'
   end
 
   it "cannot mass-assign client_secret" do
-    @client.set(:client_secret => 'foo')
+    @client.update(:client_secret => 'foo')
     @client.client_secret.should_not == 'foo'
   end
 

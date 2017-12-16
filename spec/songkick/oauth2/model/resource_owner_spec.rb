@@ -61,7 +61,7 @@ describe Songkick::OAuth2::Model::ResourceOwner do
 
     describe "with scopes" do
       before do
-        @authorization.set(scope: 'foo bar')
+        @authorization.update(scope: 'foo bar')
       end
 
       it "merges the new scopes with the existing ones" do
