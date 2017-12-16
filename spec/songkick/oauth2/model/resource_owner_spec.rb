@@ -61,7 +61,7 @@ describe Songkick::OAuth2::Model::ResourceOwner do
 
     describe "with scopes" do
       before do
-        @authorization.update_attribute(:scope, 'foo bar')
+        @authorization.set(scope: 'foo bar')
       end
 
       it "merges the new scopes with the existing ones" do
@@ -85,4 +85,3 @@ describe Songkick::OAuth2::Model::ResourceOwner do
     Songkick::OAuth2::Model::Authorization.count.should be_zero
   end
 end
-

@@ -48,7 +48,7 @@ describe Songkick::OAuth2::Model::Authorization do
     end
 
     it "is valid if both access_tokens are nil" do
-      Songkick::OAuth2::Model::Authorization.first.update_attribute(:access_token, nil)
+      Songkick::OAuth2::Model::Authorization.first.set(access_token: nil)
       authorization.access_token = nil
       authorization.should be_valid
     end
@@ -136,7 +136,7 @@ describe Songkick::OAuth2::Model::Authorization do
 
   describe "#exchange!" do
     it "saves the record" do
-      authorization.should_receive(:save!)
+      authorization.should_receive(:save)
       authorization.exchange!
     end
 
@@ -235,4 +235,3 @@ describe Songkick::OAuth2::Model::Authorization do
     end
   end
 end
-

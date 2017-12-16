@@ -2,22 +2,26 @@ module Songkick
   module OAuth2
     module Model
 
-      class Authorization < ActiveRecord::Base
-        self.table_name = :oauth2_authorizations
+      class Authorization < Sequel::Model(:oauth2_authorizations)
+        plugin :polymorphic
+        plugin :validation_helpers
+        plugin :active_model
+        plugin :finder
+        plugin :association_proxies
 
-        belongs_to :oauth2_resource_owner, :polymorphic => true
+        many_to_one :oauth2_resource_owner, :polymorphic => true
         alias :owner  :oauth2_resource_owner
         alias :owner= :oauth2_resource_owner=
 
-        belongs_to :client, :class_name => 'Songkick::OAuth2::Model::Client'
+        many_to_one :client, :class => 'Songkick::OAuth2::Model::Client'
 
-        validates_presence_of :client, :owner
-
-        validates_uniqueness_of :code,               :scope => :client_id, :allow_nil => true
-        validates_uniqueness_of :refresh_token_hash, :scope => :client_id, :allow_nil => true
-        validates_uniqueness_of :access_token_hash,                        :allow_nil => true
-
-        attr_accessible nil
+        def validate
+          super
+          validates_presence [:client, :owner]
+          validates_unique :access_token_hash, allow_nil: true
+          validates_unique :code, allow_nil: true #,               :scope => :client_id
+          validates_unique :refresh_token_hash, allow_nil: true #, :scope => :client_id
+        end
 
         class << self
           private :create, :new
@@ -95,7 +99,7 @@ module Songkick
           self.code          = nil
           self.access_token  = self.class.create_access_token
           self.refresh_token = nil
-          save!
+          save
         end
 
         def expired?
@@ -134,4 +138,3 @@ module Songkick
     end
   end
 end
-

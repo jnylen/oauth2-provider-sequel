@@ -133,7 +133,7 @@ describe Songkick::OAuth2::Provider::Exchange do
       end
 
       describe "when the client has not registered a redirect_uri" do
-        before { @client.update_attribute(:redirect_uri, nil) }
+        before { @client.set(redirect_uri: nil) }
 
         it "is valid" do
           exchange.error.should be_nil
@@ -160,7 +160,7 @@ describe Songkick::OAuth2::Provider::Exchange do
     end
 
     describe "with an expired code" do
-      before { @authorization.update_attribute(:expires_at, 1.day.ago) }
+      before { @authorization.set(expires_at: 1.day.ago) }
 
       it "is invalid" do
         exchange.error.should == "invalid_grant"
@@ -223,7 +223,7 @@ describe Songkick::OAuth2::Provider::Exchange do
     end
 
     describe "for a user with no existing authorization" do
-      let(:authorization) { Songkick::OAuth2::Model::Authorization.find_by_oauth2_resource_owner_id(@alice.id) }
+      let(:authorization) { Songkick::OAuth2::Model::Authorization.find(oauth2_resource_owner_id: @alice.id) }
       before { params['username'] = 'Alice' }
 
       it_should_behave_like "validates required parameters"
@@ -350,4 +350,3 @@ describe Songkick::OAuth2::Provider::Exchange do
 
   end
 end
-

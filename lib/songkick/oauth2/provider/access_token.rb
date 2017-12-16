@@ -47,7 +47,7 @@ module Songkick
 
         def authorize!(access_token, error)
           return unless @authorization = Model.find_access_token(access_token)
-          @authorization.update_attribute(:access_token, nil) if error
+          @authorization.set(access_token: nil) if error
         end
 
         def validate!
@@ -70,4 +70,3 @@ module Songkick
     end
   end
 end
-

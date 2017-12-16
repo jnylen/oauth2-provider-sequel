@@ -9,13 +9,14 @@ Factory.sequence :user_name do |n|
 end
 
 Factory.define :owner, :class => TestApp::User do |u|
+  u.to_create { |instance| instance.save }
   u.name { Factory.next :user_name }
 end
 
 Factory.define :client, :class => Songkick::OAuth2::Model::Client do |c|
+  c.to_create { |instance| instance.save }
   c.client_id     { Songkick::OAuth2.random_string }
   c.client_secret { Songkick::OAuth2.random_string }
   c.name          { Factory.next :client_name }
   c.redirect_uri  'https://client.example.com/cb'
 end
-

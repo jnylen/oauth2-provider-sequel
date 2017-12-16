@@ -1,17 +1,11 @@
 module TestApp
 
-  class User < ActiveRecord::Base
-    self.table_name = :users
-
-    include Songkick::OAuth2::Model::ResourceOwner
-    include Songkick::OAuth2::Model::ClientOwner
+  class User < Sequel::Model(:users)
+    plugin :oauth2_client_owner
+    plugin :oauth2_resource_owner
 
     def self.[](name)
-      if respond_to?(:find_or_create_by)
-        find_or_create_by(:name => name)
-      else
-        find_or_create_by_name(name)
-      end
+      find_or_create(:name => name)
     end
   end
 
@@ -34,4 +28,3 @@ module TestApp
   end
 
 end
-
