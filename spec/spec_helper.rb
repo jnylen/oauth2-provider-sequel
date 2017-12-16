@@ -1,44 +1,35 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'as-duration'
 
-require 'active_record'
-require 'protected_attributes' if defined?(ActiveRecord::VERSION) && ActiveRecord::VERSION::MAJOR > 3
+require 'dotenv'
+Dotenv.load(File.expand_path('../../.env.test', __FILE__))
 
-require 'songkick/oauth2/provider'
+require File.dirname(__FILE__) + '/sequel_setup'
 
-case ENV['DB']
-  when 'mysql'
-    ActiveRecord::Base.establish_connection(
-        :adapter  => 'mysql',
-        :host     => '127.0.0.1',
-        :username => 'root',
-        :database => 'oauth2_test')
-  when 'postgres'
-    ActiveRecord::Base.establish_connection(
-        :adapter  => 'postgresql',
-        :host     => '127.0.0.1',
-        :username => 'postgres',
-        :database => 'oauth2_test')
-  else
-    dbfile = File.expand_path('../test.sqlite3', __FILE__)
-    File.unlink(dbfile) if File.file?(dbfile)
+RSpec.configure do |config|
+  # to run only specific specs, add :focus to the spec
+  #   describe "foo", :focus do
+  # OR
+  #   it "should foo", :focus do
+  config.filter_run :focus => true
+  config.run_all_when_everything_filtered = true
+  config.expect_with(:rspec) { |c| c.syntax = :should }
 
-    ActiveRecord::Base.establish_connection(
-        :adapter  => 'sqlite3',
-        :database => dbfile)
-end
+  config.before do
+    Songkick::OAuth2::Provider.enforce_ssl = false
+    time = Time.now
+    Time.stub(:now).and_return time
+  end
 
-require 'logger'
-ActiveRecord::Base.logger = Logger.new(STDERR)
-ActiveRecord::Base.logger.level = Logger::INFO
-
-Songkick::OAuth2::Model::Schema.up
-
-ActiveRecord::Schema.define do |version|
-  create_table :users, :force => true do |t|
-    t.string :name
+  config.after do
+    [ :oauth2_clients, :oauth2_authorizations,
+      :users
+    ].each { |k| DB[k].delete }
   end
 end
+
+require 'songkick/oauth2/provider'
 
 require 'test_app/provider/application'
 require 'request_helpers'
@@ -48,30 +39,6 @@ require 'thin'
 Thin::Logging.silent = true
 $VERBOSE = nil
 
-RSpec.configure do |config|
-  # to run only specific specs, add :focus to the spec
-  #   describe "foo", :focus do
-  # OR
-  #   it "should foo", :focus do
-  config.treat_symbols_as_metadata_keys_with_true_values = true # default in rspec 3
-  config.filter_run :focus => true
-  config.run_all_when_everything_filtered = true
-
-  config.before do
-    Songkick::OAuth2::Provider.enforce_ssl = false
-    time = Time.now
-    Time.stub(:now).and_return time
-  end
-
-  config.after do
-    [ Songkick::OAuth2::Model::Client,
-      Songkick::OAuth2::Model::Authorization,
-      TestApp::User
-
-    ].each { |k| k.delete_all }
-  end
-end
-
 def create_authorization(params)
   Songkick::OAuth2::Model::Authorization.__send__(:create) do |authorization|
     params.each do |key, value|
@@ -79,4 +46,3 @@ def create_authorization(params)
     end
   end
 end
-

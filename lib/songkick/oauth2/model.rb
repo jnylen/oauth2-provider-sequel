@@ -1,4 +1,4 @@
-require 'active_record'
+require 'sequel'
 
 module Songkick
   module OAuth2
@@ -33,9 +33,8 @@ module Songkick
 
       def self.find_access_token(access_token)
         return nil if access_token.nil?
-        Authorization.find_by_access_token_hash(Songkick::OAuth2.hashify(access_token))
+        Authorization.where(access_token_hash: Songkick::OAuth2.hashify(access_token)).first
       end
     end
   end
 end
-

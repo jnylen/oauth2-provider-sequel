@@ -2,20 +2,28 @@ module Songkick
   module OAuth2
     module Model
 
-      class Client < ActiveRecord::Base
-        self.table_name = :oauth2_clients
+      class Client < Sequel::Model(:oauth2_clients)
+        plugin :polymorphic
+        plugin :validation_helpers
+        plugin :active_model
+        plugin :hook_class_methods
+        plugin :finder
+        plugin :association_proxies
 
-        belongs_to :oauth2_client_owner, :polymorphic => true
+        many_to_one :oauth2_client_owner, :polymorphic => true
         alias :owner  :oauth2_client_owner
         alias :owner= :oauth2_client_owner=
 
-        has_many :authorizations, :class_name => 'Songkick::OAuth2::Model::Authorization', :dependent => :destroy
+        one_to_many :authorizations, :class => 'Songkick::OAuth2::Model::Authorization', :dependent => :destroy
 
-        validates_uniqueness_of :client_id, :name
-        validates_presence_of   :name, :redirect_uri
-        validate :check_format_of_redirect_uri
 
-        attr_accessible :name, :redirect_uri
+
+        def validate
+          super
+          validates_presence [:name, :redirect_uri]
+          validates_unique :client_id, :name
+          check_format_of_redirect_uri
+        end
 
         before_create :generate_credentials
 
@@ -56,4 +64,3 @@ module Songkick
     end
   end
 end
-

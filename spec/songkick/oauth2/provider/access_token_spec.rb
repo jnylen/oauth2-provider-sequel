@@ -79,7 +79,7 @@ describe Songkick::OAuth2::Provider::AccessToken do
   end
 
   describe "when the authorization has expired" do
-    before { @authorization.update_attribute(:expires_at, 1.hour.ago) }
+    before { @authorization.update(expires_at: 1.hour.ago) }
     it_should_behave_like "invalid token"
 
     it "returns an error response" do
@@ -136,4 +136,3 @@ describe Songkick::OAuth2::Provider::AccessToken do
     end
   end
 end
-

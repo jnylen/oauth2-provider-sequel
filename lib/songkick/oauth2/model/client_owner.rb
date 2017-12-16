@@ -4,9 +4,9 @@ module Songkick
 
       module ClientOwner
         def self.included(klass)
-          klass.has_many :oauth2_clients,
-                         :class_name => 'Songkick::OAuth2::Model::Client',
-                         :as => :oauth2_client_owner
+          klass.one_to_many :oauth2_clients,
+                      :class => 'Songkick::OAuth2::Model::Client',
+                      :as => :oauth2_client_owner
         end
       end
 
